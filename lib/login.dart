@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/api/service.dart';
 import 'package:flutter_application_1/dashboard.dart';
 
 import 'package:get/get.dart';
@@ -14,6 +15,20 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  final _formState = GlobalKey<FormState>();
+  TextEditingController _user = TextEditingController();
+  TextEditingController _pass = TextEditingController();
+
+  Future _masuk() async {
+    var response = await DataService().LoginService(_user.text, _pass.text);
+    if (response == true) {
+      Get.offAll(Dashboard());
+    } else {
+      Get.defaultDialog(
+        title: 'User/pass Salah',
+      );
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,7 +80,14 @@ class _LoginState extends State<Login> {
             SizedBox(
               height: 20,
             ),
-            TextField(
+            TextFormField(
+              validator: (value) {
+                if (value == ''){
+                  return "username tdk boleh kosong";
+                }
+                return null;
+              },
+              controller: _user,
               decoration: InputDecoration(
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0)),
@@ -75,7 +97,14 @@ class _LoginState extends State<Login> {
             SizedBox(
               height: 10,
             ),
-            TextField(
+            TextFormField(
+              validator: (value) {
+                if (value == ''){
+                  return "password tdk boleh kosong";
+                }
+                return null;
+              },
+              controller: _pass,
               obscureText: true,
               decoration: InputDecoration(
                   border: OutlineInputBorder(
@@ -88,7 +117,9 @@ class _LoginState extends State<Login> {
             ),
             ElevatedButton(
                 onPressed: () {
-                  Get.offAll(Dashboard());
+                  if (_formState.currentState!.validate()) {
+                    _masuk();
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                     minimumSize: Size.fromHeight(50),
